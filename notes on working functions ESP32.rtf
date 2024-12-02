@@ -1,0 +1,142 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2709
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica-Bold;\f1\fswiss\fcharset0 Helvetica;\f2\fnil\fcharset0 HelveticaNeue;
+}
+{\colortbl;\red255\green255\blue255;\red31\green107\blue192;}
+{\*\expandedcolortbl;;\cspthree\c25645\c49867\c77726;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid1\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid1}
+{\list\listtemplateid2\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid101\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid2}
+{\list\listtemplateid3\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid201\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid3}
+{\list\listtemplateid4\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid301\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid4}
+{\list\listtemplateid5\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid401\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid5}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}{\listoverride\listid2\listoverridecount0\ls2}{\listoverride\listid3\listoverridecount0\ls3}{\listoverride\listid4\listoverridecount0\ls4}{\listoverride\listid5\listoverridecount0\ls5}}
+\paperw11900\paperh16840\margl1440\margr1440\vieww15380\viewh15300\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\b\fs54 \cf0 CHECK VOLTAGES THRU ACTUAL CIRCUIT, LLC, ETC\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f1\b0\fs30 \cf0 With ONLY step/dir connected from ESP32 to LLC, Dir(LLC)&Gnd (ESP32)=3,3v, but Dir(LLC)&Gnd (distribution board on backboard)=2v (or less?), and OUTPUT Dir was even less..?? 1.4-1.6v\
+alberto has given me 2 types of 4 channel LLC, one bidirectional, the other directional, so can try these, however will need 2x 5v and 3.3v wiring to power said LLCs, as need 2 of them\'85\
+** FIXED ** after Alberto recommended testing with a pot in series with first Dir signal and then Pulse signal, discovered that DRIVER inputs logic HIGH/LOW threshold is 1.3v, so NO LLC needed  \
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\b\fs36 \cf0 Encoder \uc0\u55357 \u57314 
+\f1\b0\fs30 \
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\b \cf0 ESP32Encoder
+\f1\b0  simpleEncoderDemo works fine, 1000PPR, via 3.3v, and pins spec in sketch.. in theory is via PCNT hardware counter\'85 so do NOT need to update any variable, just when sending encoder position data, include a call to the counter for the actual value\'85 this will almost always be in a static moment, so no need to call constantly, but during moves, can call each 0.5-1s..?\
+Encoder colours wires:\
+Red 	- vcc\
+White 	- gnd\
+Yellow 	- A+\
+Blue 	- B+\
+CHECKS! test how many encoder steps are 100% stroke, and use this variable (maxEncoderStepsPlunger) as a check before each InjectProcess starts, to make sure enough material is left in machine (before Purge show on screen, at PurgeZero also check and show Green or Red on screen if NextInject (+ 5%?) fits or not\
+CHECKS! during testing phases, include a Home function that does NOT automatically zero encoder, just reports EncoderPosition, to see if steps have been lost after a few hours use\
+\
+\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\b\fs36 \cf0 FastAccelStepper \uc0\u55357 \u57313 
+\f1\b0\fs30 \
+revise course 
+\f2\fs32 \cf2 https://valarsystems.com/blogs/val-2000/section-10-motor-setup
+\f1\fs30 \cf0   as they use this library, ESP32, and show how to dedicate 1 Core of ESP32 to ONLY motor functions (core 0 is por default dedicated to wifi, and loop() is core 1, so as no wifi, use core 0), to guarantee uninterrupted function on this core, all other MCU loads cargo on other core, Encoder calls are off both cores and callable when required\
+\
+include actual button/pot sketch to check functionality on ESP32\'85. does not respond to button presses, butpot values do work.. had also included both new inline ACS712 current sensors (with inline 10k resistor).. \
+separate and test each component with example sketches\'85\
+FIXED! it seems driver logic HIGH/LOW threshold is 1.3v, so NO LLC needed (tried 3 types LLC, all gave strange voltages at driver input on connecting to driver \uc0\u55358 \u56631 )\
+\uc0\u55357 \u57313  working 2 button sketch with fixed speed 50%, w/o LLC, motor moves smooth and with acceleration on button presses (Constant move).. to incorporate, distinct Programmed and Constant motor move functions \
+\
+\
+MotorFunction should be called from StateMachine, a) first taking the variables pertinent to that state and writing them to global standard MotorFunction variables, b) call MotorFunction to move motor with its standard variables, which should move as per the variables just updated\
+\
+As will assign motor function as a task to Core 0, have to verify that calls from Core 1 loop() to this task/function on Core 0 will not need any special extra coding..?\
+\
+\
+
+\f0\b\fs36 WS2812B_tests \uc0\u55357 \u57314 
+\f1\b0\fs30 \
+working test sketch to change colores of LEDs behind buttons\
+\uc0\u55357 \u56629  brightness of ALL LED\'92s change on button press, could be acceptable so user sees any brightness change is SOME button has been pressed\
+\uc0\u55357 \u57313  currentDuration tests not quite working, to change color of other LED\'92s after 1s, ok, but other LED does not change back to original color on release/!isPressed/changed/rose etc, not sure how to do this.. revise more examples..? adding another .update before second \'93if\'94 does work, but not always..? also, is possibly adding more MCU time to check button, + debounce time..?\
+Also, in my use case, a button hold for currrentDuration will (in all cases?) make a change of State Machine, where a new set of color instructions will be generated anyway..? Will not need to change colores back (not working well), only reduce brightness (working fine) before next State will change colours anyway\
+\
+\
+
+\f0\b\fs36 Buttons_tests 
+\f1\b0\fs30 \uc0\u55357 \u57314 \
+Blue wire 			- down\
+Orange wire 		- up\
+orange/white wire 	- select\
+blue/white 			- gnd\
+respond perfectly well with Bounce2 library, can also measure a delay, si WB2812B tests above, check that all \'93long presses\'94 will make a State Change anyway\
+\
+\
+
+\f0\b\fs36 Inductive endstops_tests
+\f1\b0\fs30 \
+will be assigning as buttons with Bounce2 library as well, as they are basically buttons with HIGH/LOW logic\'85\
+Top & Bottom sensors are NO, 5v, go to LOW / GND on activation, so pins with pull-up to avoid floating\
+Clamp sensor is NC, 0v, goes HIGH / 5v on activation, so pin with pull-down to avoid floating\
+min working voltage 5v (do not work at 3.3v), and min signal returned 4.4 top and bottom, 4.7 clamp  \uc0\u55357 \u56637  step-down/ LLC\
+\
+\
+\
+\
+\
+\
+
+\f0\b\fs36 StateMachine - revise spreadsheet made to indicate all situations
+\f1\b0\fs30 \
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\b \cf0 INIT States, on power on
+\f1\b0 \
+INIT_HEATING  //  temp of machine too low to allow movement\
+\pard\tx220\tx720\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\li720\fi-720\pardirnatural\partightenfactor0
+\ls1\ilvl0\cf0 {\listtext	\uc0\u8259 	}power on, temp < 170C, \
+{\listtext	\uc0\u8259 	}NO MOTOR MOVE POSSIBLE, \
+{\listtext	\uc0\u8259 	}button LED's RED solid\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+INIT_HOT_NOT_HOMED  // temp above min, ready for movement\
+\pard\tx220\tx720\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\li720\fi-720\pardirnatural\partightenfactor0
+\ls2\ilvl0\cf0 {\listtext	\uc0\u8259 	}temp > 170C\
+{\listtext	\uc0\u8259 	}button LED's YELLOW solid\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+INIT_HOMED_ENCODER_ZEROED  //  Homed for FIRST time after power on Zeros Encoder, ALL later homings do NOT reset Encoder\
+\pard\tx220\tx720\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\li720\fi-720\pardirnatural\partightenfactor0
+\ls3\ilvl0\cf0 {\listtext	\uc0\u8259 	}user has pressed for first time Home\
+{\listtext	\uc0\u8259 	}motor moves to TopEndStop\
+{\listtext	\uc0\u8259 	}Encoder is zeroed, InitEncoderZeroedFlag =1\
+{\listtext	\uc0\u8259 	}Motor is only zeroed when about to do measured moves, will move to Refill position (set position from TopEndStop)\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\b \cf0 REFILL & COMPRESSION states
+\f1\b0 \
+REFILL  // position with plunger just above barrel opening, so user can load cold plastic into machine\
+\pard\tx220\tx720\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\li720\fi-720\pardirnatural\partightenfactor0
+\ls4\ilvl0\cf0 {\listtext	\uc0\u8259 	}motor moves to RefillOffsetPositiion\
+{\listtext	\uc0\u8259 	}button LEDs GREEN/OFF/OFF (will return to Refill after NextInjection) or GREEN/BLUE/BLUE (will NOT return to Refill after NextInjection, EndOfDayFlag=1)\
+{\listtext	\uc0\u8259 	}user can press both lower buttons to change bool EndOfDayFlag\
+{\listtext	\uc0\u8259 	}user can press GREEN button to confirm loading complete & NozzleBlack is in place\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+COMPRESSION  // motor will move down first at med speed, until ComparisonFunction goes above threshold, then will continue until 0 speed\
+\pard\tx220\tx720\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\li720\fi-720\pardirnatural\partightenfactor0
+\ls5\ilvl0\cf0 {\listtext	\uc0\u8259 	}button LED's RED (Cancel) / OFF (nothing) / RED FLASHING (Starting Compression), YELLOW FLASHING (ComparisonFunction active), GREEN SOLID (completed)\
+{\listtext	\uc0\u8259 	}ComparisonFunction compares SentMotorSteps and RealEncoderSteps for every, ej. 20 (?) steps.. when detects ej 50% (?) loss (only 10 steps Real to Sent), reduces Speed to 50% (?) and continues again, until Speed is below minSpeedThresholdForCompression, and then exits function\
+{\listtext	\uc0\u8259 	}InsufficientFillCheck - if Encoder steps show that < 80-90% (?) of stroke is full (motor moved > 20-10% (?) of StrokeLength before ComparisonFunction finishes, then advices user that another Refill is required and goes back to Refill\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+\
+}
