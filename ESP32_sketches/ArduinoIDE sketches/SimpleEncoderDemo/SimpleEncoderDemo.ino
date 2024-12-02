@@ -2,8 +2,8 @@
 
 #include <ESP32Encoder.h> // https://github.com/madhephaestus/ESP32Encoder.git 
  
-#define CLK 36 // CLK ENCODER 
-#define DT 39 // DT ENCODER 
+#define CLK 34 // CLK ENCODER 
+#define DT 35 // DT ENCODER 
  
 ESP32Encoder encoder;
  

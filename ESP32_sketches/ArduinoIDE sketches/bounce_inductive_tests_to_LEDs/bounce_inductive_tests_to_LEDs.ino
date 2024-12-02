@@ -20,10 +20,10 @@ bounce_inductive_tests_to_LEDs.ino
  */
 
 // WE WILL attach() THE BUTTON TO THE FOLLOWING PIN IN setup()
-#define TOP_ENDSTOP_PIN 22
-#define BOTTOM_ENDSTOP_PIN 21
+#define TOP_ENDSTOP_PIN 19
+#define BOTTOM_ENDSTOP_PIN 18
 #define BARREL_ENDSTOP_PIN 5
-#define EMERGENCY_STOP_PIN 4
+#define EMERGENCY_STOP_PIN 0
 
 #define DEBOUNCE_INTERVAL 5
 
@@ -31,7 +31,7 @@ bounce_inductive_tests_to_LEDs.ino
 // 1) SOME BOARDS HAVE A DEFAULT LED (LED_BUILTIN)
 //#define LED_PIN LED_BUILTIN
 // 2) OTHERWISE SET YOUR OWN PIN
-#define PIN 25
+#define PIN 33
 #define LED_COUNT 3
 
 // define some colors

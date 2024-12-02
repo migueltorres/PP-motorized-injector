@@ -1,6 +1,10 @@
 /*   
 stepper_2but_for_ESP32_fastaccel.ino
  */
+ 
+#define CLK 34 // CLK ENCODER 
+#define DT 35 // DT ENCODER 
+
 #define dirPinStepper    22
 //#define enablePinStepper 6
 #define stepPinStepper   23  // OC1A in case of AVR
@@ -17,9 +21,15 @@ int downPinState;
 int upPinState;
 int potReading =500;
 int motorSpeed;
+int old_position;
+int position;
 
+#include <RotaryEncoderPCNT.h>
 #include <FastAccelStepper.h>
 #include <elapsedMillis.h>
+
+RotaryEncoderPCNT encoder(CLK, DT);
+
 
 FastAccelStepperEngine engine = FastAccelStepperEngine();
 FastAccelStepper *stepper = NULL;
@@ -31,6 +41,9 @@ void setup()
   Serial.begin(115200);
   pinMode(downPin, INPUT_PULLUP);
   pinMode(upPin, INPUT_PULLUP);
+
+old_position = encoder.position();
+Serial.println(old_position);
 
 
   engine.init();
@@ -52,7 +65,7 @@ void executeMotorCommand(int8_t runState)
 //	  stepper1.setAcceleration(200);
       stepper->stopMove();
 	    motorSpeed = 0;
-	    stepper->setCurrentPosition(0);
+	    //stepper->setCurrentPosition(0);
       break;
     case 1:
 	    stepper->setSpeedInHz(runSpeed);
@@ -68,23 +81,21 @@ void executeMotorCommand(int8_t runState)
 
 void loop() 
 {
+  position = encoder.position()/10;
   if (/*(runState!=runState) ||*/ (printTime >= 200))
    {
-    Serial.print("F");
-    Serial.print(" ");
+    Serial.print("Down: ");
     Serial.print(downPinState);
-    Serial.print(" ");
-    Serial.print("B");
-    Serial.print(" ");
+    Serial.print(", Up: ");
     Serial.print(upPinState);
-    Serial.print(" ");
-    Serial.print("rS");
-    Serial.print(" ");
+    Serial.print(", rS: ");
     Serial.print(runState);
-    Serial.print(" ");
-    Serial.print("S");
-    Serial.print(" ");
-    Serial.println(runSpeed);
+    Serial.print(", Sp: ");
+    Serial.print(runSpeed);
+    Serial.print(", En: ");
+    Serial.print(position);
+    Serial.print(", FAS: ");
+    Serial.println(stepper->getCurrentPosition());
    /* Serial.print(" ");
     Serial.print("D");
     Serial.print(" ");
