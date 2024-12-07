@@ -1,22 +1,23 @@
 #include "MotorControl.h"
+#include "globals.h"
 
-FastAccelStepperEngine engine;
-FastAccelStepper *stepper;
+FastAccelStepperEngine engine = FastAccelStepperEngine();
+FastAccelStepper *stepper  = NULL;
 
 void initMotor()
 {
     engine.init(0);     // core assignment
     #if defined(SUPPORT_SELECT_DRIVER_TYPE)
-    stepper = engine.stepperConnectToPin(33,1);
+    stepper = engine.stepperConnectToPin(STEPPER_STEP_PIN,1);
     #endif
     if (stepper)
     {
-        stepper->setDirectionPin(32);
+        stepper->setDirectionPin(STEPPER_DIR_PIN);
         stepper->setAcceleration(50000);
     }
 }
 
-void ProgrammedMotorMove(int motorSpeed, int motorMoveSteps, int motorAcceleration=50000) // simply moves motor at set speed, accel and distance indicated
+void ProgrammedMotorMove(int motorSpeed, int motorMoveSteps, unsigned int motorAcceleration=50000) // simply moves motor at set speed, accel and distance indicated
 // This would allow for simpler calls where acceleration doesn't change: ProgrammedMotorMove(1000, 2000); // Speed and steps only
 //                                                                 ProgrammedMotorMove(1000, 2000, 60000); // Full control
 {

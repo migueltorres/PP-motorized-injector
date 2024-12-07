@@ -3,23 +3,17 @@
 #include "globals.h"
 #include <SPI.h>
 #include <Wire.h>
+#include <RotaryEncoderPCNT.h>
 
-initMotor();
-ESP32Encoder encoder;
+RotaryEncoderPCNT encoder(ENCODER_A_PIN, ENCODER_B_PIN);
 
-// put function declarations here:
-int myFunction(int, int);
-
-void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+void setup() 
+{
+  initMotor();
 }
+
 
 void loop() {
   // put your main code here, to run repeatedly:
 }
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
-}
