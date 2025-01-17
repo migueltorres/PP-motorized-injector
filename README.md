@@ -24,4 +24,7 @@ I would need help integrating the State Machine I have designed into a working s
 
 Please revise the contents of the repo, advise on what else is needed here, info to understand better the machine/concept, etc, and if someone on Discord could help maybe make a thread/channel (I think it is called that..?) to organise and separate interest on advancing this proyect, that would be a big help too...
 
-Thanks in advance, I feel I am a pretty good mechanic, my "tok" is gettng machines to work (my manual machines work pretty well), but software, although have a few years unfer the belt am learning and can follow quite well in ArduinoIDE (PlatformIO is still a bit more of a mistery for me, hace tried and not got good results yet..), getting a more complex sketch like this to integrate is driving me a little crazy!
+google sheets (exported from Numbers 😬) of BoM, calcs, and particularly the State Machine.. although can't remember when did this export..
+https://docs.google.com/spreadsheets/d/1dTpOeWWeW3WKA8ZfMgRmvt531EJANU4MFCuCA3LTdP0/edit?usp=sharing
+
+Thanks in advance, I feel I am a pretty good mechanic, my "tok" is getting machines to work (my manual machines work pretty well), but software, although have a few years unfer the belt am learning and can follow quite well in ArduinoIDE (PlatformIO is still a bit more of a mistery for me, hace tried and not got good results yet..), getting a more complex sketch like this to integrate is driving me a little crazy!
