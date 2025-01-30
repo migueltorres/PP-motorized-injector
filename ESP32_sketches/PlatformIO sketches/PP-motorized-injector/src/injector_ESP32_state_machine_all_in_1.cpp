@@ -761,7 +761,7 @@ void transitionToState(InjectorStates toState) {
     
     } else if (toState == COMPRESSION) {
         doMoveMotor = true;
-        compressionFunction();  // FIXME  compression function currently commented out
+        //compressionFunction();  // FIXME  compression function currently commented out
 
     } else if (toState == INJECT) {
         doMoveMotor = true;
