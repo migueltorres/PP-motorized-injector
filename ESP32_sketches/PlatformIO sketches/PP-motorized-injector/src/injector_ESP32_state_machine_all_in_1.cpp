@@ -967,6 +967,46 @@ void machineState()  //
 
   }
 
+long now; 
+long fastTaskTime = 0;
+long mediumTaskTime = 0;
+long slowTaskTime = 2;
+
+  void eventLoop() {
+  // this eventloop runs tasks based on 3 different rates: high speed tasks running every loop interation, fast tasks running every 1ms, medium tasks at 10ms, and slow tasks at 100ms
+  
+  // high speed tasks
+  bounce.update();
+
+  now = millis();
+  if (now - fastTaskTime  >= 1) {
+    fastTaskTime = now;
+    // fast tasks
+  
+  }
+  if (now - mediumTaskTime >= 10) {
+    mediumTaskTime = now;
+    // medium tasks
+    stateMachineLoop();
+
+  }
+  if (now - slowTaskTime >= 100) {
+    slowTaskTime = now;
+    // slow tasks
+    serialRegular100msMessages();
+  }
+
+}
+
+void stateMachineLoop() {
+  // latch inputs, here you can simulate inputs
+
+  // eval states
+
+  // update outputs
+}
+
+
   void setup() {
     Serial.begin(9600);
 
