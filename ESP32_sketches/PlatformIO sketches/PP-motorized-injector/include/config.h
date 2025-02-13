@@ -61,7 +61,8 @@ local and never need changing
  const int buttonShortPress = 500;               // for short press of button, ms
  const int buttonLongPress = 2000;               // long press...
  const int debounceInterval = 5;
- 
+ const int debounce_Interval = 5;
+
  
  ////////////////////
  /* steps to cm3 & cml conversion 

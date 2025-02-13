@@ -148,7 +148,6 @@ const int ringLedCount = 35;  // 35 for LED ring on end of barrel
 #define BLACK_RGB ((uint32_t)0x000000)
 #define WHITE_RGB  ((uint32_t)0xFFFFFF)
 
-const int debounce_Interval = 5;
 
 
 // libraries to include
@@ -158,145 +157,19 @@ const int debounce_Interval = 5;
 //RotaryEncoderPCNT encoder(ENCODER_A_PIN, ENCODER_B_PIN);
 
 
-#include <FastAccelStepper.h>  // *
 FastAccelStepperEngine engine = FastAccelStepperEngine();
 FastAccelStepper *stepper = NULL;
 
 
 //#include <ACS712.h> // current sensor, may not be needed, but added 2 to motor phase B + & - just in case
-#include <SPI.h>
-#include <Adafruit_MAX31855.h>  // temp board, was enclosed with quotes "" in example, not sure why
 Adafruit_MAX31855 thermocouple(TEMPNozzleVSPI_SCK_CLK, TEMPNozzleVSPI_Dpin_MOSI_CS, TEMPNozzleVSPI_MISO_DO);
 
-#include <Adafruit_NeoPixel.h>  // ws2812B RGB addressable LEDs
 Adafruit_NeoPixel keypadleds = Adafruit_NeoPixel(keypadLedCount, WS2812B_BUTTON_LEDS_PIN);
 Adafruit_NeoPixel ringleds = Adafruit_NeoPixel(ringLedCount, WS2812B_RING_LEDS_PIN);
 
-#include <Bounce2.h>  // bounce library allows to time button presses
-Bounce2::Button downButton = Bounce2::Button();
-Bounce2::Button upButton = Bounce2::Button();
-Bounce2::Button selectButton = Bounce2::Button();
-Bounce2::Button topEndstop = Bounce2::Button();
-Bounce2::Button bottomEndstop = Bounce2::Button();
-Bounce2::Button barrelEndstop = Bounce2::Button();
-Bounce2::Button EMERGENCYstop = Bounce2::Button();
 
 
-////////////////////////////////
-// Input block
-////////////////////////////////
 
-boolean readNozzleTemp = true;
-int nozzleTemperature;
-
-boolean readEmergencyStop = true;
-boolean emergencyStop;
-
-boolean readSelectButton = true;
-boolean selectButtonPressed;
-
-boolean readUpButton = true;
-boolean upButtonPressed;
-
-boolean readDownButton = true;
-boolean downButtonPressed;
-
-boolean readTopEndStop = true;
-boolean topEndStopActivated;
-
-boolean readBottomEndStop = true;
-boolean bottomEndStopActivated;
-
-boolean readBarrelEndStop = true;
-boolean barrelEndStopActivated;
-
-/**
- * 
- */
-void getInputs() {
-  if (readNozzleTemp) {
-    nozzleTemperature = thermocouple.readCelsius();
-  } 
-
-  if (readEmergencyStop) {
-    emergencyStop = EMERGENCYstop.pressed();
-  }
-
-  if (readSelectButton) {
-    selectButton.update();
-    selectButtonPressed = selectButton.pressed();
-  }
-
-  if (readUpButton) {
-    upButton.update();
-    upButtonPressed = upButton.pressed();
-  }
-
-  if (readDownButton) {
-    downButton.update();
-    downButtonPressed = downButton.pressed();
-  }
-
-  if (readTopEndStop) {
-    topEndstop.update();
-    topEndStopActivated = topEndstop.isPressed();
-  }
-
-  if (readBottomEndStop) {
-    bottomEndstop.update();
-    bottomEndStopActivated = bottomEndstop.isPressed();
-  }
-
-  if (readBarrelEndStop) {
-    barrelEndstop.update();
-    barrelEndStopActivated = barrelEndstop.isPressed();
-  }
-}
-
-
-////////////////////////////////
-// END Input block
-////////////////////////////////
-
-
-InjectorStates currentState = InjectorStates::INIT_HEATING;  // declaring variable runState can only have valid values of enum
-uint16_t error = InjectorError::NO_ERROR;
-
-////////////////////////////////
-// END State machine
-////////////////////////////////
-
-/**
- * 
- */
-  void bounceButtonsSetup() {
-    // IF YOUR BUTTON HAS AN INTERNAL PULL-UP or PULL-DOWN
-    downButton.attach(BUTTON_DOWN_PIN, INPUT_PULLUP);
-    upButton.attach(BUTTON_UP_PIN, INPUT_PULLUP);  // USE INTERNAL PULL-UP
-    selectButton.attach(BUTTON_SELECT_PIN, INPUT_PULLUP);
-    topEndstop.attach(ENDSTOP_TOP_PLUNGER_PIN, INPUT_PULLUP);
-    bottomEndstop.attach(ENDSTOP_BOTTOM_PLUNGER_PIN, INPUT_PULLUP);    //Top & Bottom NO, 5v
-    barrelEndstop.attach(ENDSTOP_BARREL_PLUNGER_PIN, INPUT_PULLDOWN);  //FINDA sensor is NC, 0v
-    EMERGENCYstop.attach(EMERGENCY_STOP_PIN, INPUT_PULLUP);    // CHECK THAT IS NO!!
-
-    // DEBOUNCE INTERVAL IN MILLISECONDS
-    downButton.interval(debounce_Interval);
-    upButton.interval(debounce_Interval);
-    selectButton.interval(debounce_Interval);
-    topEndstop.interval(debounce_Interval);
-    bottomEndstop.interval(debounce_Interval);
-    barrelEndstop.interval(debounce_Interval);
-    EMERGENCYstop.interval(debounce_Interval);
-
-    // INDICATE THAT THE LOW STATE CORRESPONDS TO PHYSICALLY PRESSING THE BUTTON
-    downButton.setPressedState(LOW);
-    upButton.setPressedState(LOW);
-    selectButton.setPressedState(LOW);
-    topEndstop.setPressedState(LOW);  // NO, with pullup, goes LOW when closed
-    bottomEndstop.setPressedState(LOW);
-    barrelEndstop.setPressedState(HIGH);  //  NC, with pulldown, goes HIGH when active
-    EMERGENCYstop.setPressedState(LOW);   //  CHECK THAT IS NO!!
-  }
 
 
 
@@ -588,12 +461,6 @@ other options..? */
 
     getInputs();
 
-    error = sanityCheck();
-    if (error != InjectorError::NO_ERROR) {
-        transitionToState(InjectorStates::ERROR_STATE);
-
-        Serial.printf("Found error!. Changing to ERROR_STATE to INIT_HEATING with error %d\n", error);
-    } 
 
     machineState();
 

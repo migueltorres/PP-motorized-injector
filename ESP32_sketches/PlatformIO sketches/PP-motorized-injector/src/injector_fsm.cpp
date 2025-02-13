@@ -1,8 +1,17 @@
 #include "injector_fsm.h"
 #include "config.h"
 
+InjectorStates currentState = InjectorStates::INIT_HEATING;  // declaring variable runState can only have valid values of enum
+uint16_t error = InjectorError::NO_ERROR;
+
 void stateMachineLoop() {
-    // latch inputs, here you can simulate inputs
+  error = sanityCheck();
+  if (error != InjectorError::NO_ERROR) {
+      transitionToState(InjectorStates::ERROR_STATE);
+
+      Serial.printf("Found error!. Changing to ERROR_STATE to INIT_HEATING with error %d\n", error);
+  } 
+  // latch inputs, here you can simulate inputs
   
     // eval states
   
